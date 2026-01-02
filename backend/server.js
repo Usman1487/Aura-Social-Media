@@ -5,23 +5,31 @@ import connectDB from './config/monogdb.js';
 import userRouter from './routes/userRoute.js';
 import postRouter from './routes/postRoute.js';
 
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-app.use(cors())
-app.use(express.json({ limit: '20mb' }))
-await connectDB();
+
+app.use(cors()); 
+app.use(express.json({ limit: '20mb' }));
+
+
+connectDB(); 
+
 
 app.use('/api/user', userRouter);
 app.use('/api/posts', postRouter);
-app.get('/', (req,res) =>{
-    res.send("API IS WORKING!!!")
+
+
+app.get('/', (req, res) => {
+    res.send("API IS WORKING!!! AURA BACKEND LIVE");
 });
 
-app.listen(PORT, ()=>{
-    console.log("Server Is Running")
-})
+
+export default app;
 
 
-
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server Is Running on port ${PORT}`);
+    });
+}
