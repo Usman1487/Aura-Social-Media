@@ -6,57 +6,63 @@ import { AppContext } from '../context/AppContext.jsx';
 
 const CreatePost = () => {
 
-  const { backendUrl } = useContext(AppContext);
+const { backendUrl, token } = useContext(AppContext);
 
   const [postData, setPostData] = useState({
     title: '',
     description: '',
-    image: null
+    image: '' 
   });
   const [preview, setPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
 
-  const handleImageChange = (e) => {
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPostData({ ...postData, image: file });
-      setPreview(URL.createObjectURL(file));
+      const base64 = await convertToBase64(file);
+      setPostData({ ...postData, image: base64 });
+      setPreview(base64);
     }
   };
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // const formData = new FormData();
-    // formData.append('title', postData.title);
-    // formData.append('description', postData.description);
-    // formData.append('image', postData.image);
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/posts/create`, postData, {
+        headers: {
+            token: token 
+        }
+      });
     
-    // const userId = localStorage.getItem('userId'); 
-    // formData.append('user_id', userId);
-
-    // try {
-     
-    //   const { data } = await axios.post(`${backendUrl}/api/posts/createpost`, formData, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data'
-    //     }
-    //   });
-
-    
-    //   if (data.success) {
-    //     alert("Post Published Successfully!");
-    //     navigate('/');
-    //   }
-    // } catch (error) {
-    //   console.error("Error publishing post:", error);
-    //   alert(error.response?.data?.message || "Something went wrong!");
-    // } finally {
-    //   setLoading(false);
-    // }
+      if (data.success) {
+        alert("Post Published Successfully!");
+        navigate('/');
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error publishing post:", error);
+      alert(error.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,45 +82,21 @@ const CreatePost = () => {
                   <span>Click to upload image</span>
                 </div>
               )}
-              <input 
-                type="file" 
-                accept="image/*" 
-                className='hidden' 
-                onChange={handleImageChange} 
-                required 
-              />
+              <input type="file" accept="image/*" className='hidden' onChange={handleImageChange}  required  />
             </label>
           </div>
 
           <div className='flex flex-col gap-2'>
             <label className='text-zinc-400 text-sm font-medium'>Title</label>
-            <input 
-              type="text" 
-              required 
-              placeholder="Give your post a catchy title" 
-              className='bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-600 text-white' 
-              value={postData.title} 
-              onChange={(e) => setPostData({ ...postData, title: e.target.value })}
-            />
+            <input  type="text" required placeholder="Give your post a catchy title" className='bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-600 text-white' value={postData.title} onChange={(e) => setPostData({ ...postData, title: e.target.value })}/>
           </div>
 
           <div className='flex flex-col gap-2'>
             <label className='text-zinc-400 text-sm font-medium'>Description</label>
-            <textarea 
-              required 
-              rows="5" 
-              placeholder="What's on your mind?" 
-              className='bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-600 text-white resize-none' 
-              value={postData.description} 
-              onChange={(e) => setPostData({ ...postData, description: e.target.value })}
-            />
+            <textarea required rows="5" placeholder="What's on your mind?" className='bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-600 text-white resize-none' value={postData.description} onChange={(e) => setPostData({ ...postData, description: e.target.value })}/>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={loading}
-            className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
+          <button type="submit"  disabled={loading} className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
             {loading ? 'Publishing...' : 'Publish Post'}
           </button>
         </form>

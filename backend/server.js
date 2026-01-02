@@ -3,16 +3,18 @@ import cors from 'cors';
 import 'dotenv/config';
 import connectDB from './config/monogdb.js';
 import userRouter from './routes/userRoute.js';
+import postRouter from './routes/postRoute.js';
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: '20mb' }))
 await connectDB();
 
 app.use('/api/user', userRouter);
+app.use('/api/posts', postRouter);
 app.get('/', (req,res) =>{
     res.send("API IS WORKING!!!")
 });

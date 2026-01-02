@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
-    image: { type: String, required: true },
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User", 
+        required: true 
+    },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    }
-}, { timestamps: true });
+    image: { type: String, required: false },
+    date: { type: Number, default: Date.now } 
+})
 
-export default mongoose.models.Post || mongoose.model('Post', postSchema);
+export default mongoose.model.post || mongoose.model("Post", postSchema);
