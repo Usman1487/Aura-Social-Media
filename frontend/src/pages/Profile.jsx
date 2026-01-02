@@ -4,6 +4,7 @@ import { CgProfile } from "react-icons/cg";
 import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import image from '../assets/pf.jpg'
 
 const Profile = () => {
   const { user, setUser, logout, backendUrl, token } = useContext(AppContext);
@@ -75,7 +76,7 @@ const Profile = () => {
         <div className='flex flex-col md:flex-row items-center gap-8 bg-zinc-900/50 p-8 rounded-3xl border border-zinc-800'>
           <div className='relative'>
             <div className='w-32 h-32 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border-2 border-blue-600'>
-              <CgProfile size={80} className='text-zinc-600' />
+              <img src={image} />
             </div>
           </div>
 
